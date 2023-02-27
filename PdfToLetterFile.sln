@@ -5,7 +5,12 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfToLetterFile", "PdfToLetterFile\PdfToLetterFile.csproj", "{7489CE4C-F8D8-4557-B58A-1F4E1B4DFD99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfProcessor", "PdfProcessor\PdfProcessor.csproj", "{18236DF4-EC61-46B0-BB54-EFBB4480D5A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdfProcessor", "PdfProcessor\PdfProcessor.csproj", "{18236DF4-EC61-46B0-BB54-EFBB4480D5A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{04710DCC-1B7D-4F7D-9F87-A50710F6638D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

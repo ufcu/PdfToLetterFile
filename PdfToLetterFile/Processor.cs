@@ -30,7 +30,7 @@ namespace PdfToLetterFile
             {
                 FileInfo fileInfo = entireFileInfoList[i];
                 Console.WriteLine($"Processing file {i} of {entireFileInfoList.Count}: {fileInfo.Name}");
-                var pdfText = _pdfProcessor.ReadPdfToText(fileInfo.FullName);
+                var pdfText = _pdfProcessor.ReadPdf(fileInfo);
 
                 if (string.IsNullOrEmpty(pdfText))
                 {
