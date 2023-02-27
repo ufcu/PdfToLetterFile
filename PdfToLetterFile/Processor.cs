@@ -1,15 +1,10 @@
-﻿
-using iTextSharp.text.pdf.parser;
-using iTextSharp.text.pdf;
-using PdfProcessor;
-using System.Text.RegularExpressions;
-using System.Text;
+﻿using PdfProcessor;
 
 namespace PdfToLetterFile
 {
     public interface IProcessor
     {
-        void ProcessPdfsInDirectory();
+        Task ProcessPdfsInDirectory();
         Task WriteTextToFile(string content);
     }
 
@@ -24,7 +19,7 @@ namespace PdfToLetterFile
             _pdfProcessor = pdfProcessor;
         }
 
-        public void ProcessPdfsInDirectory()
+        public async Task ProcessPdfsInDirectory()
         {
             var appStartTimeInCentralTimeZone = DateTime.UtcNow.ConvertToCentralTimeFromUtc();
             Console.WriteLine($"ProcessPdfsInDirectory() has begun at {appStartTimeInCentralTimeZone}");
@@ -36,7 +31,7 @@ namespace PdfToLetterFile
             {
                 FileInfo? fileInfo = entireFileInfoList[i];
                 Console.WriteLine($"Processing file {i} of {entireFileInfoList.Count}: {fileInfo.Name}");
-                var pdfText = _pdfProcessor.ReadPdfToText(fileInfo.FullName);
+                var pdfText = await _pdfProcessor.ReadPdfToText(fileInfo.FullName);
 
                 if (string.IsNullOrEmpty(pdfText))
                 {

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System;
 using System.IO;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;

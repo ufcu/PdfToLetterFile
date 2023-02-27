@@ -6,7 +6,7 @@ namespace PdfToLetterFile
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var services = Configure();
             var serviceProvider = services.BuildServiceProvider();
@@ -14,7 +14,7 @@ namespace PdfToLetterFile
 
             try
             {
-                processor.ProcessPdfsInDirectory();
+               await processor.ProcessPdfsInDirectory();
             }
             catch (Exception e)
             {
