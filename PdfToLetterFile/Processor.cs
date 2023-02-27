@@ -30,26 +30,39 @@ namespace PdfToLetterFile
             {
                 FileInfo fileInfo = entireFileInfoList[i];
                 Console.WriteLine($"Processing file {i} of {entireFileInfoList.Count}: {fileInfo.Name}");
-                var pdfText = _pdfProcessor.ReadPdf(fileInfo);
 
-                if (string.IsNullOrEmpty(pdfText))
+                var response = _pdfProcessor.ReadPdf(fileInfo);
+
+                if (response.NotFound)
+                {
+                    //todo: handle not found list (there shouldn't be any)
+                }
+
+                if (response.WasSkipped)
+                {
+                    //todo: handle was skipped for not having keys
+                }
+
+                if (response.ParsedPdf != null)
                 {
                     Console.WriteLine("There is nothing to do here.");
+
+                    await WriteTextToFile(response.ParsedPdf);
                     return;
                 }
 
-                await WriteTextToFile(pdfText);
+                //todo: move the file now that it has been processed
             }
         }
 
-        private async Task WriteTextToFile(string content)
+        private async Task WriteTextToFile(ParsedPdf parsedPdf)
         {
             var outputFile = "C:\\tmp\\uploads\\test.txt";
-            string[] lines = content.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            //string[] lines = content.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
-            Console.WriteLine($"This pdf has {lines.Length} lines to process");
+            //var text = new StreamBuilder();
 
-            await File.WriteAllLinesAsync(outputFile, lines);
+           // await File.WriteAllTextAsync(outputFile, lines);
         }
     }
 }
