@@ -20,15 +20,13 @@ namespace PdfProcessor
 
             if (File.Exists(fileName))
             {
-                using (var pdfReader = new PdfReader(fileName))
+                using var pdfReader = new PdfReader(fileName);
+                for (int page = 1; page <= pdfReader.NumberOfPages; page++)
                 {
-                    for (int page = 1; page <= pdfReader.NumberOfPages; page++)
-                    {
-                        ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-                        string currentText = PdfTextExtractor.GetTextFromPage(pdfReader, page, strategy);
-                        currentText = Encoding.UTF8.GetString(Encoding.Convert(Encoding.Default, Encoding.UTF8, Encoding.Default.GetBytes(currentText)));
-                        text.Append(currentText);
-                    }
+                    ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                    string currentText = PdfTextExtractor.GetTextFromPage(pdfReader, page, strategy);
+                    currentText = Encoding.UTF8.GetString(Encoding.Convert(Encoding.Default, Encoding.UTF8, Encoding.Default.GetBytes(currentText)));
+                    text.Append(currentText);
                 }
             }
             return text.ToString();
