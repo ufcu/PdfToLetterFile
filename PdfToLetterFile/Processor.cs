@@ -5,7 +5,6 @@ namespace PdfToLetterFile
     public interface IProcessor
     {
         Task ProcessPdfsInDirectory();
-        Task WriteTextToFile(string content);
     }
 
     public class Processor : IProcessor
@@ -29,26 +28,28 @@ namespace PdfToLetterFile
 
             for (int i = 0; i < entireFileInfoList.Count; i++)
             {
-                FileInfo? fileInfo = entireFileInfoList[i];
+                FileInfo fileInfo = entireFileInfoList[i];
                 Console.WriteLine($"Processing file {i} of {entireFileInfoList.Count}: {fileInfo.Name}");
-                var pdfText = await _pdfProcessor.ReadPdfToText(fileInfo.FullName);
+                var pdfText = _pdfProcessor.ReadPdfToText(fileInfo.FullName);
 
                 if (string.IsNullOrEmpty(pdfText))
                 {
                     Console.WriteLine("There is nothing to do here.");
                     return;
                 }
+
+                await WriteTextToFile(pdfText);
             }
         }
 
-        public async Task WriteTextToFile(string content)
+        private async Task WriteTextToFile(string content)
         {
-            var fileName = "C:\\tmp\\uploads\\test.txt";
+            var outputFile = "C:\\tmp\\uploads\\test.txt";
             string[] lines = content.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             Console.WriteLine($"This pdf has {lines.Length} lines to process");
 
-            await File.WriteAllLinesAsync(fileName, lines);
+            await File.WriteAllLinesAsync(outputFile, lines);
         }
     }
 }
