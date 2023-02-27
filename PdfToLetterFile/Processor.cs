@@ -6,6 +6,7 @@ namespace PdfToLetterFile
     public interface IProcessor
     {
         void ProcessPdfsInDirectory();
+        Task WriteTextToFile(string content);
     }
 
     public class Processor : IProcessor
@@ -39,6 +40,16 @@ namespace PdfToLetterFile
                     return;
                 }
             }
+        }
+
+        public async Task WriteTextToFile(string content)
+        {
+            var fileName = "C:\\tmp\\uploads\\test.txt";
+            string[] lines = content.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            Console.WriteLine($"This pdf has {lines.Length} lines to process");
+
+            await File.WriteAllLinesAsync(fileName, lines);
         }
     }
 }

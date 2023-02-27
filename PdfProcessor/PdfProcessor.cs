@@ -9,7 +9,6 @@ namespace PdfProcessor
     public interface IPdfProcessor
     {
         string ReadPdfToText(string fileName);
-        void WriteTextToFile(string content);
     }
 
     public class PdfProcessor : IPdfProcessor
@@ -30,16 +29,6 @@ namespace PdfProcessor
                 }
             }
             return text.ToString();
-        }
-
-        public void WriteTextToFile(string content)
-        {
-            var fileName = "C:\\tmp\\uploads\\test.txt";
-            string[] lines = content.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-
-            Console.WriteLine($"This pdf has {lines.Length} lines to process");
-
-            File.WriteAllLines(fileName, lines);
         }
     }
 }
