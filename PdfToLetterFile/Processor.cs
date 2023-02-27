@@ -1,5 +1,9 @@
 ﻿
+using iTextSharp.text.pdf.parser;
+using iTextSharp.text.pdf;
 using PdfProcessor;
+using System.Text.RegularExpressions;
+using System.Text;
 
 namespace PdfToLetterFile
 {

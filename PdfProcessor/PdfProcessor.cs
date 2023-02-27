@@ -3,23 +3,27 @@ using System;
 using System.IO;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
+using System.Threading.Tasks;
 
 namespace PdfProcessor
 {
     public interface IPdfProcessor
     {
-        string ReadPdfToText(string fileName);
+        Task<string> ReadPdfToText(string fileName);
     }
 
     public class PdfProcessor : IPdfProcessor
     {
-        public string ReadPdfToText(string fileName)
+        public async Task<string> ReadPdfToText(string fileName)
         {
             var text = new StringBuilder();
 
             if (File.Exists(fileName))
             {
-                using var pdfReader = new PdfReader(fileName);
+                var bytes = await File.ReadAllBytesAsync(fileName);
+
+                using var pdfReader = new PdfReader(bytes);
+
                 for (int page = 1; page <= pdfReader.NumberOfPages; page++)
                 {
                     ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
