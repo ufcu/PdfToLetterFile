@@ -14,7 +14,8 @@ namespace PdfToLetterFile
 
             try
             {
-               await processor.ProcessPdfsInDirectory();
+                Console.Clear();
+                await processor.ProcessPdfsInDirectory();
             }
             catch (Exception e)
             {
