@@ -8,61 +8,51 @@ namespace PdfProcessor
 {
     public interface IPdfProcessor
     {
-        ReadPdfResponse ReadPdf(FileInfo fileInfo);
+        ReadPdfResponse ReadPdf(string fileName);
     }
 
     public class PdfProcessor : IPdfProcessor
     {
-        public ReadPdfResponse ReadPdf(FileInfo fileInfo)
+        public ReadPdfResponse ReadPdf(string fileName)
         {
-            var fullName = fileInfo.FullName;
-
-            if (File.Exists(fullName))
+            // short-circuit
+            if (!File.Exists(fileName))
             {
-                using var pdfReader = new PdfReader(fullName);
-
-                var parsedPdf = new ParsedPdf();
-
-                var activeKeys = pdfReader.AcroFields.Fields.Keys.Where(z => keysToParse.Contains(z)).ToList();
-
-                if (activeKeys.Any())
+                return new ReadPdfResponse
                 {
-                    var detailArray = new ParsedPdfDetail[4];
-
-                    //instantiate the array's objects
-                    for (int i = 0; i < detailArray.Length; i++)
-                    {
-                        detailArray[i] = new ParsedPdfDetail();
-                    }
-
-                    activeKeys.ForEach(key =>
-                    {
-                        var value = pdfReader.AcroFields.GetField(key);
-                        FillPropertyWithValue(ref parsedPdf, ref detailArray, key, value);
-                    });
-
-                    //only assign those where values are set
-                    parsedPdf.Details = detailArray.Where(z => z.HasValues).ToList();
-
-                    return new ReadPdfResponse
-                    {
-                        ParsedPdf = parsedPdf
-                    };
-                }
-                else
-                {
-                    Console.WriteLine($"File {fileInfo.Name} has been skipped. It has no keys from which we're trying to parse.");
-                    return new ReadPdfResponse
-                    {
-                        WasSkipped = true
-                    };
-                }
+                    NotFound = true
+                };
             }
 
-            Console.WriteLine($"File {fileInfo.Name} not found!");
+            using var pdfReader = new PdfReader(fileName);
+
+            var parsedPdf = new ParsedPdf();
+
+            var activeKeys = pdfReader.AcroFields.Fields.Keys.Where(z => keysToParse.Contains(z)).ToList();
+
+            // short-circuit
+            if (!activeKeys.Any())
+            {
+                return new ReadPdfResponse
+                {
+                    WasSkipped = true
+                };
+            }
+
+            ParsedPdfDetail[] detailArray = GetNewParsedPdfDetailArray(4);
+
+            activeKeys.ForEach(key =>
+            {
+                var value = pdfReader.AcroFields.GetField(key);
+                FillPropertyWithValue(ref parsedPdf, ref detailArray, key, value);
+            });
+
+            //only assign those where values are set
+            parsedPdf.Details = detailArray.Where(z => z.HasValues).ToList();
+
             return new ReadPdfResponse
             {
-                NotFound = true
+                ParsedPdf = parsedPdf
             };
         }
 
@@ -111,6 +101,19 @@ namespace PdfProcessor
                 default:
                     throw new Exception($"Missing key: {key}");
             }
+        }
+
+        private ParsedPdfDetail[] GetNewParsedPdfDetailArray(int arrayLength)
+        {
+            var array = new ParsedPdfDetail[4];
+
+            //instantiate the array's objects
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = new ParsedPdfDetail();
+            }
+
+            return array;
         }
 
         private static readonly List<string> keysToParse = new List<string>

@@ -29,40 +29,72 @@ namespace PdfToLetterFile
             for (int i = 0; i < entireFileInfoList.Count; i++)
             {
                 FileInfo fileInfo = entireFileInfoList[i];
-                Console.WriteLine($"Processing file {i} of {entireFileInfoList.Count}: {fileInfo.Name}");
+                var fileName = fileInfo.Name;
+                Console.WriteLine($"Processing file {i + 1} of {entireFileInfoList.Count}: {fileName}");
 
-                var response = _pdfProcessor.ReadPdf(fileInfo);
+                var response = _pdfProcessor.ReadPdf(fileInfo.FullName);
 
                 if (response.NotFound)
                 {
-                    //todo: handle not found list (there shouldn't be any)
+                    Console.WriteLine($"File Not Found: {fileName}");
                 }
 
                 if (response.WasSkipped)
                 {
-                    //todo: handle was skipped for not having keys
+                    Console.WriteLine($"File Skipped (Invalid): {fileName}");
+                    MoveFile(fileInfo, _appsettings.InvalidDirectory);
                 }
 
                 if (response.ParsedPdf != null)
                 {
-                    Console.WriteLine("There is nothing to do here.");
-
-                    await WriteTextToFile(response.ParsedPdf);
-                    return;
+                    Console.WriteLine($"File Parsed: {fileName}");
+                    await SaveToText(response.ParsedPdf);
+                    MoveFile(fileInfo, _appsettings.ProcessedDirectory);
                 }
-
-                //todo: move the file now that it has been processed
             }
         }
 
-        private async Task WriteTextToFile(ParsedPdf parsedPdf)
+        private async Task SaveToText(ParsedPdf parsedPdf)
         {
-            var outputFile = "C:\\tmp\\uploads\\test.txt";
-            //string[] lines = content.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            CreateDirectory(_appsettings.OutputDirectory);
 
-            //var text = new StreamBuilder();
+            var outputFilePath = Path.Combine(_appsettings.OutputDirectory, _appsettings.OutputLetterFileName);
 
-           // await File.WriteAllTextAsync(outputFile, lines);
+            using TextWriter tw = new StreamWriter(outputFilePath);
+
+            foreach (var detail in parsedPdf.Details)
+            {
+                await tw.WriteLineAsync(
+                    detail.GetLetterFileLineItem(
+                        parsedPdf.FormattedAccountNumber,
+                        parsedPdf.CompanyId,
+                        parsedPdf.CompanyName));
+            }
+        }
+
+        private void MoveFile(FileInfo fileInfo, string destinationDirectory)
+        {
+            CreateDirectory(destinationDirectory);
+
+            var sourceFileName = fileInfo.FullName;
+            var destFileName = Path.Combine(destinationDirectory, fileInfo.Name);
+
+            //Copy File
+            Console.WriteLine($"Copying file {sourceFileName} to {destinationDirectory}...");
+            File.Copy(sourceFileName, destFileName);
+
+            //Delete File
+            Console.WriteLine($"Deleting file {sourceFileName} from {_appsettings.SourceDirectory}...");
+            File.Delete(sourceFileName);
+        }
+
+        private void CreateDirectory(string directoryName)
+        {
+            if (!Directory.Exists(directoryName))
+            {
+                Console.WriteLine($"Creating Directory {directoryName}...");
+                Directory.CreateDirectory(directoryName);
+            }
         }
     }
 }
