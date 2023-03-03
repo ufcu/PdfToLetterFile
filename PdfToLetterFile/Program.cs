@@ -13,15 +13,7 @@ namespace PdfToLetterFile
             var services = Configure();
             var serviceProvider = services.BuildServiceProvider();
             var processor = serviceProvider.GetRequiredService<IProcessor>();
-
-            try
-            {
-                await processor.ProcessPdfsInDirectory();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Fatal Error: {0}", e.Message);
-            }
+            await processor.ProcessPdfsInDirectory();
         }
 
         private static IServiceCollection Configure()
@@ -44,7 +36,12 @@ namespace PdfToLetterFile
 
             var appSettings = new AppSettings();
             configuration.Bind(nameof(AppSettings), appSettings);
-            services.AddProcessor(appSettings);            
+            services.AddProcessor(appSettings);
+
+
+            var emailSettings = configuration.GetSection(nameof(EmailSettings)).Get<EmailSettings>();
+            services.Configure<EmailSettings>(configuration.GetSection(nameof(EmailSettings)));
+            services.AddSingleton(emailSettings);
 
             return services;
         }
