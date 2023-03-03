@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Destructurama;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serilog;
 
 namespace PdfToLetterFile
 {
@@ -14,7 +16,6 @@ namespace PdfToLetterFile
 
             try
             {
-                Console.Clear();
                 await processor.ProcessPdfsInDirectory();
             }
             catch (Exception e)
@@ -25,15 +26,24 @@ namespace PdfToLetterFile
 
         private static IServiceCollection Configure()
         {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{env}.json", optional: true)
                 .Build();
+
+            var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .Destructure.UsingAttributes()
+                .CreateLogger();
+            Log.Logger = logger;
 
             IServiceCollection services = new ServiceCollection();
             services.TryAddSingleton<IProcessor, Processor>();
 
             var appSettings = new AppSettings();
-            configuration.Bind("AppSettings", appSettings);
+            configuration.Bind(nameof(AppSettings), appSettings);
             services.AddProcessor(appSettings);            
 
             return services;
