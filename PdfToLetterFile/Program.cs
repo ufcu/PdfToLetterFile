@@ -38,7 +38,6 @@ namespace PdfToLetterFile
             configuration.Bind(nameof(AppSettings), appSettings);
             services.AddProcessor(appSettings);
 
-
             var emailSettings = configuration.GetSection(nameof(EmailSettings)).Get<EmailSettings>();
             services.Configure<EmailSettings>(configuration.GetSection(nameof(EmailSettings)));
             services.AddSingleton(emailSettings);

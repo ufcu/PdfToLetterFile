@@ -61,8 +61,6 @@ namespace PdfProcessor
             //do nothing if there is no value
             if (string.IsNullOrWhiteSpace(value)) return;
 
-            Console.WriteLine($"{key}:{value}");
-
             switch (key)
             {
                 case "Account Number":

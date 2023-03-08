@@ -126,6 +126,7 @@ namespace PdfToLetterFile
                         _logger.Debug("Attempting to send email");
                         client.Send(mailMessage);
                     }
+                    catch { }
                 }
             }
         }
@@ -134,7 +135,7 @@ namespace PdfToLetterFile
         {
             var message = new MailMessage
             {
-                From = new MailAddress("PdfToLetterFile@ufcu.org")
+                From = new MailAddress("noreply@ufcu.org")
             };
             message.ReplyToList.Add(message.From);
 
@@ -164,8 +165,7 @@ namespace PdfToLetterFile
             {
                 return new List<string>()
                 {
-                    "nturner@ufcu.org",
-                    "AMcgee@ufcu.org"
+                    "_ITLAFHTeam@ufcu.org",
                 };
             }
         }
